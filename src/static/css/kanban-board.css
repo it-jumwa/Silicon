@@ -1,0 +1,23 @@
+/* Styling for medium devices (landscape tablets, 768px and up) */
+.kanban-board {
+    display: flex;
+    justify-content: center;
+    gap: 1em;
+}
+
+.column {
+    width: 20px;
+    height: auto;
+    flex: 1;
+    border: 2px #d693a5 solid;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+h2 {
+    background-color: #d693a5;
+    text-align: center;
+    color: #fff;
+    margin: 0;
+    padding: 4px;
+}

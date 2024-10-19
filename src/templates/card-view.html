@@ -1,0 +1,44 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='css/kanban-board.css') }}">
+
+<div class="kanban-board">
+  <div class="column not-started" id="not-started">
+    <h2>To Do</h2>
+    <div class="card-grid not-started" id="not-started-tasks"></div>
+  </div>
+
+  <div class="column" id="in-progress">
+    <h2>In Progress</h2>
+    <div class="card-grid" id="in-progress-tasks"></div>
+  </div>
+
+  <div class="column" id="completed">
+    <h2>Completed</h2>
+    <div class="card-grid" id="completed-tasks"></div>
+  </div>
+</div>
+
+<!--  Include JavaScript for card dragging functionality-->
+<script src="{{ url_for('static', filename='js/kanban-functions.js') }}"></script>
+
+<style>
+  .kanban-board {
+      display: flex;
+      flex: 1;
+  }
+
+  .column {
+      flex: 1;
+  }
+
+  @media (max-width: 412px) {
+      .column {
+          width: 100%;
+          min-height: 15vh;
+          border-radius: 0;
+      }
+
+      .kanban-board {
+        display: block;
+      }
+  }
+</style>

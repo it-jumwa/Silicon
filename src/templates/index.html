@@ -1,0 +1,61 @@
+<!-- templates/index.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Home Page</h1>
+
+    {% include 'components/sprint-button.html' %}
+    <script src="{{ url_for('static', filename='js/create-sprint.js') }}"></script>
+    {% include 'sprint-backlog.html' %}
+
+
+<div class="product-backlog-header">
+  <!-- Subheading -->
+  <h1>Product Backlog</h1>
+
+  <!-- Buttons to toggle views -->
+  <div class="view-toggle-buttons">
+    <button id="card-view-button" class="icon-button icon-card-view" onclick="toggleView('card')">
+      <img src="static/images/icon-card-view.svg" alt="card-view" class="icon card-view-icon"/>
+    </button>
+    <button id="list-view-button" class="icon-button icon-list-view" onclick="toggleView('list')">
+      <img src="static/images/icon-list-view.svg" alt="list-view" class="icon list-view-icon"/>
+    </button>
+  </div>
+</div>
+
+<!-- Task Details Modal -->
+<div id="task-details-modal" class="container modal container-form" style="display: none">
+  <div class="modal-content">
+    <div class="extended-view-header">
+      <button class="close-btn" onclick="closeModal()">&times;</button>
+      <h2 id="modal-title">Task Title</h2>
+    </div>
+    <br>
+    <p><strong>Description:</strong> <span id="modal-description"></span></p>
+    <p><strong>Story Points:</strong> <span id="modal-story-points"></span></p>
+    <p><strong>Priority:</strong> <span id="modal-priority" class="task-tag priority-tag"></span></p>
+    <p><strong>Status:</strong> <span id="modal-status" class="task-tag progress-tag"></span></p>
+    <strong>Development Tag:</strong> <div id="modal-development-tags" class="task-tag development-tags"></div>
+    <p><strong>Created by:</strong> <span id="modal-creator"></span></p>
+    <p id="created-at"><strong>Created at:</strong> <span id="modal-created-at"></span></p>
+  </div>
+</div>
+
+<!-- Button to open task creation form -->
+<button id="create-task-btn" class="button create-task-btn" onclick="openForm()" style="margin-bottom: 10px">
+  Create Task
+</button>
+
+<!-- Include the Create Task Button component -->
+{% include 'components/create-task-form.html' %}
+
+<div class="list-view" id="list-view"></div>
+<div class="card-view" id="card-view" style="display: none">
+  {% include 'card-view.html' %}
+</div>
+
+<script src="{{ url_for('static', filename='js/task-functions.js') }}"></script>
+
+{% include 'components/edit-task-form.html' %}
+{% endblock %}

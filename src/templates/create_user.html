@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Create User{% endblock %}
+
+{% block content %}
+<div class="container-admin">
+  <h3 class="header-title">Create User</h3>
+
+  <!-- Flash messages for feedback -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  {% for category, message in messages %}
+  {% if category == 'error' %}
+  <div class="alert alert-danger" role="alert">
+    {{ message }}
+  </div>
+  {% elif category == 'success' %}
+  <div class="alert alert-success" role="alert">
+    {{ message }}
+  </div>
+  {% endif %}
+  {% endfor %}
+  {% endif %}
+  {% endwith %}
+
+  <form method="POST" action="{{ url_for('create_user') }}">
+    <!-- Form fields -->
+    <div class="form-group">
+      <label for="new_username">New Username</label>
+      <input
+        type="text"
+        class="form-control"
+        id="new_username"
+        name="new_username"
+        placeholder="Enter new username"
+        required
+      />
+    </div>
+    <div class="form-group">
+      <label for="new_password">New Password</label>
+      <input
+        type="password"
+        class="form-control"
+        id="new_password"
+        name="new_password"
+        placeholder="Enter new password"
+        required
+      />
+    </div>
+    <br />
+    <div class="text-center">
+      <button type="submit" class="btn btn-small">Create User</button>
+  </div>
+  
+  <!-- Back button -->
+  <div class="text-center" style="margin-top: 20px;">
+      <a href="{{ url_for('admin_page') }}" class="btn-small">Back</a>
+  </div>
+  
+</div>
+{% endblock %}

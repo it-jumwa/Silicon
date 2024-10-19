@@ -1,0 +1,76 @@
+<!-- Form to edit task details, initially hidden -->
+<div id="edit-task-popup" class="container-form" style="display: none">
+  <form id="edit-task-form" class="edit-task-form" style="padding-bottom: 60px">
+    <h1>Edit Task</h1>
+
+    <!-- Adding a task title -->
+    <label for="edit-title"><strong>Title</strong></label>
+    <input type="text" id="edit-title" class="input-form" placeholder="Title of task" required>
+    <br>
+
+    <!-- Adding a description -->
+    <label for="edit-description"><strong>Description</strong></label>
+    <input type="text" id="edit-description" class="input-form" placeholder="Description of task" required>
+    <br>
+
+    <!-- Adding a development tag -->
+    <strong>Development Tag</strong><br>
+    <div class="check-box">
+      <input type="checkbox" id="edit-front-end" name="edit-development-tags" value="1">
+      <label for="edit-front-end">Front End</label>
+
+      <input type="checkbox" id="edit-back-end" name="edit-development-tags" value="2">
+      <label for="edit-back-end">Back End</label>
+
+      <input type="checkbox" id="edit-ui-ux" name="edit-development-tags" value="4">
+      <label for="edit-ui-ux">UI/UX</label>
+
+      <input type="checkbox" id="edit-api" name="edit-development-tags" value="8">
+      <label for="edit-api">API</label>
+
+      <input type="checkbox" id="edit-testing" name="edit-development-tags" value="16">
+      <label for="edit-testing">Testing</label>
+    </div>
+
+    <!-- Priority dropdown -->
+    <label for="edit-priority-tag"><strong>Priority</strong></label>
+    <select id="edit-priority-tag" name="edit-priority-tag" class="input-form">
+      <option value="low">Low</option>
+      <option value="medium">Medium</option>
+      <option value="important">Important</option>
+      <option value="urgent">Urgent</option>
+    </select>
+    <br>
+
+    <!-- Story point input -->
+    <label for="edit-story-point"><strong>Story Point Estimate</strong></label>
+    <input type="number" id="edit-story-point" class="input-form" style="width: 40px">
+    <br>
+
+    <!-- Progress dropdown -->
+    <label for="edit-progress-tag"><strong>Progress</strong></label>
+    <select id="edit-progress-tag" name="edit-progress-tag" class="input-form">
+      <option value="not-started">Not Started</option>
+      <option value="in-progress">In Progress</option>
+      <option value="completed">Completed</option>
+    </select>
+    <br>
+
+    <!-- Secondary progress dropdown -->
+    <label for="edit-in-progress-tag" style="visibility: hidden"><strong>Progress Stage</strong></label>
+    <select id="edit-in-progress-tag" name="edit-in-progress-tag" class="input-form" style="visibility: hidden">
+      <option value="planning">Planning</option>
+      <option value="integration">Integration</option>
+      <option value="development">Development</option>
+      <option value="testing">Testing</option>
+    </select>
+    <br><br>
+
+    <!-- Buttons -->
+    <button type="submit" class="button submit-edit-task-btn" disabled>Submit</button>
+    <button type="button" class="cancel-btn" onclick="closeEditForm()">Cancel</button>
+  </form>
+</div>
+
+<!-- Include JS for edit form handling -->
+<script src="{{ url_for('static', filename='js/edit-task.js') }}"></script>

@@ -1,0 +1,15 @@
+
+<button id="create-sprint-btn">Create Sprint</button>
+<div id="sprint-form-container" style="display: none;">
+    <form id="sprint-form">
+        <label for="start-date">Sprint Start Date: </label>
+        <input type="date" id="start-date" name="start-date" required>
+        <label for="end-date">Sprint End Date: </label>
+        <input type="date" id="end-date" name="end-date" required>
+        <button type="submit" id="submit-sprint-btn">submit</button>
+    </form>
+</div>
+
+<script src="{{ url_for('static', filename='js/create-sprint.js') }}"></script>
+
+

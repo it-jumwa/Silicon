@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Change Username{% endblock %}
+
+{% block content %}
+<div class="container-admin">
+  <h3 class="header-title">Change Username</h3>
+
+
+  <!-- Flash messages for feedback -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  {% for category, message in messages %}
+  {% if category == 'error' %}
+  <div class="alert alert-danger" role="alert">
+    {{ message }}
+  </div>
+  {% elif category == 'success' %}
+  <div class="alert alert-success" role="alert">
+    {{ message }}
+  </div>
+  {% endif %}
+  {% endfor %}
+  {% endif %}
+  {% endwith %}
+
+  <form method="POST" action="{{ url_for('change_username') }}">
+    <div class="form-group">
+      <label for="old_username">Old Username</label>
+      <input
+        type="text"
+        class="form-control"
+        id="old_username"
+        name="old_username"
+        placeholder="Enter old username"
+        required
+      />
+    </div>
+    <div class="form-group">
+      <label for="new_username_change">New Username</label>
+      <input
+        type="text"
+        class="form-control"
+        id="new_username_change"
+        name="new_username_change"
+        placeholder="Enter new username"
+        required
+      />
+    </div>
+    <br />
+    <div class="text-center">
+      <button type="submit" class="btn btn-small">Change Username</button>
+  </div>
+  
+  <!-- Back button -->
+  <div class="text-center" style="margin-top: 20px;">
+      <a href="{{ url_for('admin_page') }}" class="btn-small">Back</a>
+  </div>
+</div>
+{% endblock %}

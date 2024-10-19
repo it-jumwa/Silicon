@@ -1,0 +1,59 @@
+<!-- Header section containing the site name and navbar -->
+<div class="header">
+  <!-- Site name displayed on the left side -->
+  <h1 class="site-name">Silicon</h1>
+  <!-- Navigation bar containing links to different pages -->
+  <div class="navbar">
+    <a href="{{ url_for('home') }}" class="icon-button icon-home-btn">
+      <img src='static/images/icon-home.svg' alt='Home' class='icon home-icon'>
+    </a>
+    {% if session['username'] == 'admin' %}
+      <a class='button btn-admin-top admin-nav' style="margin: 0" href="{{ url_for('admin_page') }}">Admin</a>
+    {% endif %}
+    <a href="{{ url_for('logout') }}" class="icon-button icon-log-out-btn">
+      <img src='static/images/icon-log-out.svg' alt='Log out' class='icon log-out-icon'>
+    </a>
+  </div>
+</div>
+<!--
+`url_for` takes the name of a view function (or route) and generates the URL associated with that route.
+-->
+
+<!-- Style section to define the CSS for the page -->
+<style>
+    /* Styles for the header containing the site name and navbar */
+    .header {
+        display: flex; /* Uses flexbox layout to align items */
+        align-items: center; /* Vertically centers items within the header */
+        padding: 10px; /* Adds space around the header */
+        background-color: #b32244; /* Dark shades - Sets the background color of the header */
+        border-bottom: 2px solid #ddd; /* Adds a border line below the header */
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Styles for the site name */
+    .site-name {
+        font-family: 'Cabin', sans-serif; /* Uses the Cabin font for the site name */
+        color: #f7f5f4; /* Light shades - Sets the text color */
+        font-size: 1.5em; /* Sets the font size of the site name */
+        justify-self: left; /* Aligns the site name to the left */
+        flex-grow: 1;
+    }
+
+    /* Styles the navbar container for horizontal layout */
+    .navbar {
+        display: flex;
+        gap: 10px;
+        margin: 0;
+    }
+
+    /* Hover effect for the navbar links */
+    .navbar button:hover {
+        background-color: #b32244; /* Changes background color of links on hover to a darker shade */
+    }
+
+    .header h1 {
+        margin: 0;
+    }
+</style>

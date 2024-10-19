@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task Manager</title>
+</head>
+<body>
+<h1>Task Manager</h1>
+<form id="taskForm">
+  <input type="text" id="title" placeholder="Task Title" required>
+  <input type="text" id="creator" placeholder="Creator Name" required>
+  <button type="submit">Create Task</button>
+</form>
+<h2>Tasks</h2>
+<ul id="taskList"></ul>
+
+<script>
+  document.getElementById('taskForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const title = document.getElementById('title').value;
+    const creator = document.getElementById('creator').value;
+
+    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    tasks.push({title: title, creator: creator});
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+
+    loadTasks();
+  });
+
+  function loadTasks() {
+    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    const taskList = document.getElementById('taskList');
+    taskList.innerHTML = '';
+    tasks.forEach(task => {
+      const li = document.createElement('li');
+      li.textContent = `${task.title} (Created by: ${task.creator})`;
+      taskList.appendChild(li);
+    });
+  }
+
+  // Load tasks on page load
+  window.onload = loadTasks;
+</script>
+</body>
+</html>
