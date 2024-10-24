@@ -33,7 +33,7 @@ db.init_app(app)
 
 with app.app_context():
     db.create_all()  # Create all tables defined in the models
-    usernames = ['admin', 'alicia', 'ryani', 'abi', 'thisangi', 'jaimee', 'xin']
+    usernames = ['admin', 'Alicia', 'Ryani', 'Abi', 'Thisangi', 'Jaimee', 'Xin']
 
     for username in usernames:
         existing_user = User.query.filter_by(username=username).first()
@@ -226,42 +226,60 @@ def get_tasks_list():
 # --- Routing ---
 @app.route('/')
 def home():
-    if 'username' in session:
+    """
+    Render the home page if the user is logged in, otherwise redirect to the login page.
+
+    :return: Rendered template for the home page or redirect to log in.
+    """
+    if is_logged_in():
         return render_template('index.html')
     else:
         return redirect(url_for('login'))
 
 
-# for logging in, enter either your first name in lowercase (e.g. 'alicia') or 'abc' for the username, and '123' for the password
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """
+    Handle user login by verifying credentials and managing session state.
+
+    :return: Rendered login page or redirect to home page upon successful login.
+    """
     if request.method == 'POST':
-        username = request.form['username']
+        form_username = request.form['username']
         password = request.form.get('password')
 
-        user: User = User.query.filter_by(username=username).first()  # query the username
-        if user:  # if username exists in database
-            if user.password == password:  # correct password
-                flash('Login successful!', category='success')
-                session['username'] = username  # store username in session
+        user: User = User.query.filter_by(username=form_username).first()
+        if user:
+            if user.password == password:
+                session['username'] = form_username
                 session['from_login'] = True
-                return redirect(url_for('home'))  # redirect to home page
+                flash_and_redirect('Login successful!', 'success', 'home')
             else:
-                flash('Incorrect password, please try again', category='error')  # incorrect password
-        else:  # username does not exist
+                flash('Incorrect password, please try again', category='error')
+        else:
             flash('Username does not exist', category='error')
     return render_template('login.html')
 
 
 @app.route('/logout')
 def logout():
+    """
+    Clear the user session and redirect to the login page.
+
+    :return: Redirect to the login page.
+    """
     session.clear()
     return redirect(url_for('login'))
 
 
 @app.route('/admin')
 def admin_page():
-    if 'username' in session and session['username'] == 'admin':
+    """
+    Render the admin page if the user is logged in and is an admin.
+
+    :return: Rendered admin page or redirect to log in if unauthorized.
+    """
+    if is_logged_in() and is_admin():
         if session.get('from_login'):
             session.pop('_flashes', None)
             session.pop('from_login')
@@ -270,192 +288,190 @@ def admin_page():
 
 @app.route('/create-user')
 def create_user_page():
-    if 'username' in session and session['username'] == 'admin':
+    """
+    Render the create user page if the user is logged in and is an admin.
+
+    :return: Rendered create user page or redirect to log in if unauthorized.
+    """
+    if is_logged_in() and is_admin():
         return render_template('create_user.html')
     return redirect(url_for('login'))
 
 
 @app.route('/change-username')
 def change_username_page():
-    if 'username' in session and session['username'] == 'admin':
+    """
+    Render the change username page if the user is logged in and is an admin.
+
+    :return: Rendered change username page or redirect to log in if unauthorized.
+    """
+    if is_logged_in() and is_admin():
         return render_template('change_username.html')
     return redirect(url_for('login'))
 
 
 @app.route('/change-password')
 def change_password_page():
-    if 'username' in session and session['username'] == 'admin':
+    """
+    Render the change password page if the user is logged in and is an admin.
+
+    :return: Rendered change password page or redirect to log in if unauthorized.
+    """
+    if is_logged_in() and is_admin():
         return render_template('change_password.html')
     return redirect(url_for('login'))
 
 
 @app.route('/add_task', methods=['POST'])
 def add_task():
+    """
+    Add a new task to the database after validating the request data.
+
+    :return: JSON response with the created task data or an error message.
+    """
     try:
-        # Get the task data from the AJAX request
         data = request.get_json()
-        title = data.get('title')
-        description = data.get('description')
-        story_point = data.get('story_point') or 0
-        development_bit_vector = data.get('development_bit_vector')
-        priority_tag = data.get('priority_tag')
-        progress_tag = data.get('progress_tag')
-        user = session.get('username')
+        is_valid, message = validate_task_data(data)
+        if not is_valid:
+            return jsonify({'error': message}), 400
 
-        created_at = get_aest_time()
+        new_task = Task(
+            title=data['title'],
+            description=data['description'],
+            story_point=data.get('story_point', 0),
+            development_bit_vector=data['development_bit_vector'],
+            priority_tag=data['priority_tag'],
+            progress_tag=data['progress_tag'],
+            user=get_current_user(),
+            created_at=get_aest_time()
+        )
 
-        new_task = Task(title=title, description=description, story_point=story_point,
-                        development_bit_vector=development_bit_vector,
-                        priority_tag=priority_tag, progress_tag=progress_tag, user=user, created_at=created_at)
+        add_to_db(new_task)
 
-        db.session.add(new_task)  # Add the new task to the SQLAlchemy session
-        db.session.commit()  # Commit to database
-
-        # Return the newly added task as JSON
-        return jsonify({
-            'id': new_task.id,
-            'title': new_task.title,
-            'description': new_task.description,
-            'story_point': new_task.story_point,
-            'development_bit_vector': new_task.development_bit_vector,
-            'priority_tag': new_task.priority_tag,
-            'progress_tag': new_task.progress_tag,
-            'user': new_task.user,
-            'created_at': new_task.created_at
-        })
+        return jsonify(get_task_schema(new_task)), 201
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 
 @app.route('/delete_task/<int:task_id>', methods=['DELETE'])
 def delete_task(task_id):
-    task = Task.query.get(task_id)  # Get task via id
+    """
+    Delete a task from the database based on the task ID.
+
+    :param task_id: The ID of the task to delete.
+    :return: JSON response with the list of remaining tasks.
+    """
+    task = Task.query.get(task_id)
     if task:
-        db.session.delete(task)
-        db.session.commit()
-    # Returns the list of tasks even if it has not been found
-    tasks_list = get_tasks()
-    return jsonify(tasks_list)  # Return the list of tasks as JSON
+        delete_from_db(task)
+    return get_tasks()  # Assuming this function returns the updated task list.
 
 
 @app.route('/get_tasks', methods=['GET'])
 def get_tasks():
-    tasks = Task.query.all()
-    tasks_list = [{
-        'id': task.id,
-        'title': task.title,
-        'description': task.description,
-        'story_point': task.story_point,
-        'development_bit_vector': task.development_bit_vector,
-        'priority_tag': task.priority_tag,
-        'progress_tag': task.progress_tag,
-        'user': task.user,
-        'created_at': task.created_at
-    } for task in tasks]
-    return jsonify({'tasks': tasks_list})
+    """
+    Retrieve and return a list of all tasks in JSON format.
+
+    :return: JSON response containing the list of tasks.
+    """
+    tasks = get_tasks_list()
+    return jsonify({'tasks': tasks})
 
 
 @app.route('/get_task/<int:task_id>', methods=['GET'])
 def get_task(task_id):
+    """
+    Retrieve and return a specific task by its ID.
+
+    :param task_id: The ID of the task to retrieve.
+    :return: JSON response with the task data or an error message if not found.
+    """
     task = Task.query.get(task_id)
     if task:
-        return jsonify({
-            'id': task.id,
-            'title': task.title,
-            'description': task.description,
-            'story_point': task.story_point,
-            'development_bit_vector': task.development_bit_vector,
-            'priority_tag': task.priority_tag,
-            'progress_tag': task.progress_tag,
-            'user': task.user,
-            'created_at': task.created_at
-        })
+        return jsonify(get_task_schema(task))
     return jsonify({'error': 'Task not found'}), 404
 
 
 @app.route('/edit_task/<int:task_id>', methods=['PUT'])
 def edit_task(task_id):
+    """
+    Edit an existing task based on the task ID and provided data.
+
+    :param task_id: The ID of the task to edit.
+    :return: JSON response with the updated task data or an error message.
+    """
     try:
-        # Get the task from the database
         task = Task.query.get(task_id)
         if not task:
             return jsonify({'error': 'Task not found'}), 404
 
-        # Get the updated data from the request
         data = request.get_json()
-        task.title = data.get('title', task.title)
-        task.description = data.get('description', task.description)
-        task.story_point = data.get('story_point', task.story_point)
-        task.development_bit_vector = data.get('development_bit_vector', task.development_bit_vector)
-        task.priority_tag = data.get('priority_tag', task.priority_tag)
-        task.progress_tag = data.get('progress_tag', task.progress_tag)
+        update_model_instance(task, data)
 
-        # Save the changes to the database
-        db.session.commit()
-
-        # Return the updated task as JSON
-        return jsonify({
-            'id': task.id,
-            'title': task.title,
-            'description': task.description,
-            'story_point': task.story_point,
-            'development_bit_vector': task.development_bit_vector,
-            'priority_tag': task.priority_tag,
-            'progress_tag': task.progress_tag,
-            'user': task.user,
-            'created_at': task.created_at
-        })
+        return jsonify(get_task_schema(task))
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 
 @app.route('/create_user', methods=['POST'])
 def create_user():
-    if 'username' in session and session['username'] == 'admin':  # check if user logged in as admin
+    """
+    Create a new user with the provided username and password.
+
+    :return: Redirect to the create user page with appropriate flash messages.
+    """
+    if is_logged_in() and is_admin():
         new_username = request.form['new_username']
         new_password = request.form['new_password']
-        existing_user = User.query.filter_by(
-            username=new_username).first()  # check if user with same username alrady exists
-        if existing_user:
+        if check_user_exists(new_username):
             flash('Username already exists', category='error')
         else:
-            new_user = User(username=new_username, password=new_password)  # create new user
-            db.session.add(new_user)
-            db.session.commit()
+            user_to_create = User(username=new_username, password=new_password)
+            add_to_db(user_to_create)
             flash('User created!', category='success')
         return redirect(url_for('create_user_page'))
 
 
 @app.route('/change_username', methods=['POST'])
 def change_username():
-    if 'username' in session and session['username'] == 'admin':
-        old_username = request.form['old_username']  # retrieve 'old' username
-        new_username_change = request.form['new_username_change']  # retrieve new username
-        user = User.query.filter_by(username=old_username).first()
+    """
+    Change an existing user's username.
+
+    :return: Redirect to the change username page with appropriate flash messages.
+    """
+    if is_logged_in() and is_admin():
+        old_username = request.form['old_username']
+        new_username_change = request.form['new_username_change']
+        user = get_model_instance(User, username=old_username)
         if user:
-            if User.query.filter_by(username=new_username_change).first():  # check if username already exists in db
+            if check_user_exists(new_username_change):
                 flash('New username already exists', category='error')
             else:
-                user.username = new_username_change  # update username
+                user.username = new_username_change
                 db.session.commit()
                 flash('Username updated!', category='success')
         else:
-            flash('Username not found', category='error')  # if user with username doesn't exist
+            flash('Username not found', category='error')
         return redirect(url_for('change_username_page'))
 
 
 @app.route('/change_password', methods=['POST'])
 def change_password():
-    if 'username' in session and session['username'] == 'admin':
-        username = request.form['username']
+    """
+    Change an existing user's password.
+
+    :return: Redirect to the change password page with appropriate flash messages.
+    """
+    if is_logged_in() and is_admin():
+        form_username = request.form['username']
         new_password_change = request.form['new_password_change']
-        user = User.query.filter_by(username=username).first()  # find user by username
+        user = get_model_instance(User, username=form_username)
         if user:
             user.password = new_password_change
             db.session.commit()
             flash('Password updated!', category='success')
         else:
-            flash('Username not found', category='error')  # if user not found
+            flash('Username not found', category='error')
         return redirect(url_for('change_password_page'))
 
 
