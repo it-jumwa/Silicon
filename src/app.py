@@ -2,12 +2,20 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 
 from flask import Flask, render_template, request, jsonify, flash, redirect, url_for, session
+from flask_bcrypt import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
-from werkzeug import Response
 
 db = SQLAlchemy()
 
 
+# --- Configuration Class ---
+class Config:
+    SECRET_KEY = 'secret key'  # Use a secure random key in production
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///sql_database.db'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+
+# --- Create Database Models ---
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
@@ -26,9 +34,9 @@ class User(db.Model):
     password = db.Column(db.String(150), nullable=False)
 
 
+# --- Initialise App ---
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secret key'  # setting a secret key for encrypting session data and cookies
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sql_database.db'
+app.config.from_object(Config)
 db.init_app(app)
 
 with app.app_context():
@@ -38,7 +46,7 @@ with app.app_context():
     for username in usernames:
         existing_user = User.query.filter_by(username=username).first()
         if not existing_user:
-            new_user = User(username=username, password='123')
+            new_user = User(username=username, password=generate_password_hash('123').decode('utf-8'))
             db.session.add(new_user)
     db.session.commit()
 
@@ -54,15 +62,14 @@ def get_current_user():
     return session.get('username')
 
 
-def is_logged_in() -> Response:
+def is_logged_in():
     """
     Check if a user is currently logged in.
 
     Returns:
-        Response: Redirects to login page if not logged in.
+        Redirects to login page if not logged in.
     """
-    if 'username' not in session:
-        return redirect(url_for('login'))
+    return 'username' in session
 
 
 def is_admin():
@@ -249,16 +256,17 @@ def login():
         password = request.form.get('password')
 
         user: User = User.query.filter_by(username=form_username).first()
-        if user:
-            if user.password == password:
-                session['username'] = form_username
-                session['from_login'] = True
-                flash_and_redirect('Login successful!', 'success', 'home')
-            else:
-                flash('Incorrect password, please try again', category='error')
-        else:
+
+        if not user:
             flash('Username does not exist', category='error')
-    return render_template('login.html')
+
+        if check_password_hash(user.password, password):
+            session['username'] = form_username
+            session['from_login'] = True
+            flash_and_redirect('Login successful!', 'success', 'home')
+        else:
+            flash('Incorrect password, please try again', category='error')
+    return render_template('index.html')
 
 
 @app.route('/logout')
