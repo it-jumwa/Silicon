@@ -1,16 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Login</title>
-  <link
-    rel="stylesheet"
-    href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-  />
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-  <link rel="icon" type="image/x-icon" href="static/images/favicon.png">
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block content %}
 <div class="container-login">
   <h3 class="text-center" style="margin-top: 50px;">Login Page</h3>
 
@@ -57,5 +47,10 @@
     </div>
   </form>
 </div>
-</body>
-</html>
+
+<style>
+  .navbar {
+      display: none;
+  }
+</style>
+{% endblock %}
