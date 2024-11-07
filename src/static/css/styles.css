@@ -326,6 +326,10 @@ input[type="text"],input[type="password"] {
     justify-content: space-evenly;
 }
 
+.kanban-board .card-grid {
+    min-height: 50px;
+}
+
 .task-header {
     display:block
 }
@@ -450,6 +454,11 @@ input[type="text"],input[type="password"] {
 
 .task-form h1,.edit-task-form h1 {
     margin-top:0
+}
+
+.sprint-backlog {
+    padding-bottom:20px;
+    border-bottom: solid 2px #ddd;
 }
 
 @media only screen and (max-width: 412px) {

@@ -1,44 +1,41 @@
 <!-- Main heading of the page-->
-<h1>Sprint Backlog</h1>
-<div id="sprint-details">
-  <h3 id="sprint-start"></h3>
-  <h3 id="sprint-end"></h3>
-</div>
-
-<div class="kanban-board">
-  <div class="column" id="to-do">
-    <h2>To Do</h2>
-    <div class="card-grid" id="sprint-not-started-tasks"></div>
+<div class="sprint-backlog">
+  <h1>Sprint Backlog</h1>
+  <div id="sprint-details">
+    <h3>Goal: </h3>
+    <h4 id="sprint-start"></h4>
+    <h4 id="sprint-end"></h4>
   </div>
 
-  <div class="column" id="in-progress">
-    <h2>In Progress</h2>
-    <div class="card-grid" id="sprint-in-progress-tasks"></div>
+  <div class="kanban-board">
+    <div class="column" id="to-do">
+      <h2>To Do</h2>
+      <div class="card-grid" id="sprint-not-started-tasks"></div>
+    </div>
+
+    <div class="column" id="in-progress">
+      <h2>In Progress</h2>
+      <div class="card-grid" id="sprint-in-progress-tasks"></div>
+    </div>
+
+    <div class="column" id="completed">
+      <h2>Completed</h2>
+      <div class="card-grid" id="sprint-completed-tasks"></div>
+    </div>
   </div>
 
-  <div class="column" id="completed">
-    <h2>Completed</h2>
-    <div class="card-grid" id="sprint-completed-tasks"></div>
-  </div>
-</div>
-
-<style>
-  .kanban-board .card-grid {
-      min-height: 50px;
-  }
-</style>
-
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const sprintStartDate = localStorage.getItem('sprintStartDate');
-    const sprintEndDate = localStorage.getItem('sprintEndDate');
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const sprintStartDate = localStorage.getItem('sprintStartDate');
+      const sprintEndDate = localStorage.getItem('sprintEndDate');
 //validate
-    if (sprintStartDate && sprintEndDate) {
-      document.getElementById('sprint-start').textContent = "Start Date: " + sprintStartDate;
-      document.getElementById('sprint-end').textContent = "End Date: " + sprintEndDate;
-    } else {
-      document.getElementById('sprint-start').textContent = "No sprint created.";
-      document.getElementById('sprint-end').textContent = "";
-    }
-  });
-</script>
+      if (sprintStartDate && sprintEndDate) {
+        document.getElementById('sprint-start').textContent = 'Start Date: ' + sprintStartDate;
+        document.getElementById('sprint-end').textContent = 'End Date: ' + sprintEndDate;
+      } else {
+        document.getElementById('sprint-start').textContent = 'No sprint created.';
+        document.getElementById('sprint-end').textContent = '';
+      }
+    });
+  </script>
+</div>
